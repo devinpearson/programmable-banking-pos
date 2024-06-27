@@ -15,6 +15,9 @@ The POS device has the following hardware components:
 
 ![POS Device](pos_device.jpg)
 
+## Wiring diagram:
+![Wiring](wiring.png)
+
 ## Installation
 Setup a virtual environment and install the dependencies.
 ```bash
