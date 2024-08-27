@@ -5,6 +5,10 @@ import time
 from statemachine import StateMachine, State
 import requests
 import os
+import sys
+
+host_url = "https://localhost:3001"
+terminal_id = 9003
 
 class Menu:
     def initialize(self):
@@ -40,7 +44,7 @@ class Menu:
             lcd.write_string("Transaction Successful")
         else:
             lcd.write_string("Transaction Declined")
-        time.sleep(2)
+        time.sleep(6)
 
     def awaitingCard(self):
         lcd.clear()
@@ -166,36 +170,45 @@ def readRfid():
         # print(text)
 
 def getDetails():
-    # The API endpoint to communicate with
-    url = "http://192.168.1.170:3000/" + str(9004)
+        # The API endpoint to communicate with
+        url = host_url + "/terminals/" + str(terminal_id)
 
-    # A GET request to tthe API
-    response = requests.get(url)
-
-    # Print the response
-    response_json = response.json()
-    global currency
-    currency = response_json["symbol"]
-    print(response_json)
+        # A GET request to tthe API
+        response = requests.get(url)
+        if response.status_code == 200:
+            print('Success!')
+            response_json = response.json()
+            global currency
+            currency = response_json["symbol"]
+            print(response_json)
+        elif response.status_code == 404:
+            print('Terminal not registered. Terminal: ' + str(terminal_id))
+            sys.exit(1)
+        else:
+            print('Something went wrong ' + str(response.status_code))
 
 def postTransaction():
     print(card_value)
     new_data = {
         "centsAmount": str(card_amount)+'00',
         "card": str(card_value),
-        "terminalId": 9004
+        "terminalId": str(terminal_id)
     }
 
     # The API endpoint to communicate with
-    url_post = "http://192.168.1.170:3000/transaction"
+    url_post = host_url + "/terminals/" + str(terminal_id) + "/transactions"
 
     # A POST request to tthe API
-    post_response = requests.post(url_post, json=new_data)
-
-    # Print the response
-    post_response_json = post_response.json()
-    print(post_response_json)
-    return post_response_json["result"]
+    response = requests.post(url_post, json=new_data)
+    if response.status_code == 200:
+        print('Success!')
+        # Print the response
+        response_json = response.json()
+        print(response_json)
+        return response_json["result"]
+    else:
+        print('Something went wrong ' + str(response.status_code))
+        return False
 
 def Shutdown():  
     os.system("sudo shutdown -h now") 
