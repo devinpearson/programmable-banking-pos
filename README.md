@@ -35,7 +35,7 @@ The venv is needed to create a virtual environment for the project.
 The dev package is needed to install the python dev packages. The spidev package wont install without this package.
 ```bash
 sudo apt update
-sudo apt install python3-venv python3-dev
+sudo apt install python3-pip python3-venv python3-dev
 ```
 
 Configure Pi to allow i2c communication.
@@ -43,10 +43,12 @@ Configure Pi to allow i2c communication.
 sudo raspi-config
 ```
 Select `Interfacing Options` -> `I2C` -> `Yes`
+Select `Interfacing Options` -> `SPI` -> `Yes`
+Select `Finish` and reboot the Pi.
 
 Reboot the PI
 ```bash
-sudo reboot
+sudo reboot now 
 ```
 
 Create folder for the project
@@ -64,6 +66,13 @@ source env/bin/activate
 ```bash
 pip install -r requirements.txt
 ```
+
+Update the pos.py file with the correct http address for the card issuer server.
+Also update the id of the pos device. This is used to identify the device when sending the transaction to the server.
+
+Update the card server to add the pos device id to the list of devices that are allowed to perform transactions.
+
+```python
 
 ## Usage
 
